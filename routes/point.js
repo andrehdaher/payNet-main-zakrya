@@ -11,7 +11,7 @@ const Balance = require("../models/Balance");
 router.post("/add-point", async (req, res) => {
   try {
     const { formData, email } = req.body;
-        const existUser = await User.findOne({ email: formData.username });
+    const existUser = await User.findOne({ email: formData.username });
     if (existUser) {
       return res.status(400).json({ message: "هذا المستخدم موجود بالفعل" });
     }
@@ -25,13 +25,13 @@ router.post("/add-point", async (req, res) => {
 
     await newPoint.save();
 
-    const newUser =  new User(
+    const newUser = new User(
       {
-        email : formData.username,
-        password : formData.password,
-        name : formData.owner,
-        number : formData.number,
-        role : "user-point",
+        email: formData.username,
+        password: formData.password,
+        name: formData.owner,
+        number: formData.number,
+        role: "user-point",
       }
     )
     await newUser.save()
@@ -41,7 +41,7 @@ router.post("/add-point", async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "حدث خطأ أثناء إضافة نقطة البيع" });
   }
-  
+
 });
 
 router.get('/add-point', async (req, res) => {
@@ -74,7 +74,7 @@ router.delete('/delete/:id', async (req, res) => {
 });
 
 router.put('/add-balance/:id', async (req, res) => {
-  const { amount, email , username , owner } = req.body;
+  const { amount, email, username, owner } = req.body;
   const id = req.params.id;
 
   try {
@@ -108,9 +108,9 @@ router.put('/add-balance/:id', async (req, res) => {
     user.balance -= value;
     await user.save();
 
-        const balanceDaen = await Balance.findOne({}).sort({_id:-1});
-        const amountDaen = balanceDaen.amountDaen || 0;
-        
+    const balanceDaen = await Balance.findOne({}).sort({ _id: -1 });
+    const amountDaen = balanceDaen.amountDaen || 0;
+
 
     // حفظ عملية الدفع
     const balanceDoc = new Balance({
@@ -120,7 +120,6 @@ router.put('/add-balance/:id', async (req, res) => {
       operator: owner,
       amount: value,
       isConfirmed: true,
-      amountDaen,
     });
 
     await balanceDoc.save();
@@ -135,7 +134,7 @@ router.put('/add-balance/:id', async (req, res) => {
 
 router.get("/all", async (req, res) => {
   try {
-    const {email} = req.query
+    const { email } = req.query
     const payments = await Balance.find({ destination: email }).sort({ date: -1 });
     res.json(payments);
   } catch (error) {
@@ -146,8 +145,8 @@ router.get("/all", async (req, res) => {
 
 router.get("/all-point", async (req, res) => {
   try {
-    const {email} = req.query;
-    const payments = await Balance.find({ name :email }).sort({ date: -1 });
+    const { email } = req.query;
+    const payments = await Balance.find({ name: email }).sort({ date: -1 });
     res.json(payments);
   } catch (error) {
     console.error("خطأ في جلب الدفعات:", error);
@@ -164,14 +163,14 @@ router.get("/all-point", async (req, res) => {
 // ✅ فلترة العمليات حسب المستخدم
 router.get("/user/confirmed/point", async (req, res) => {
   try {
-    const {emailPoint} = req.query
+    const { emailPoint } = req.query
 
     const payments = await Point.find({
       email: emailPoint,
     });
     const paymentsPoint = payments.map(p => p.username);
 
-const finical = await Payment.find({ email: { $in: paymentsPoint } });
+    const finical = await Payment.find({ email: { $in: paymentsPoint } });
 
     res.status(201).json(finical)
 
